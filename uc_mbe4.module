@@ -2,9 +2,9 @@
 
 /**
  * @file
- * Process payments using Authorize.net. Supports AIM and ARB.
+ * Process payments using mbe4 mobile payment.
  *
- * Development sponsored by Digital Dollhouse - http://www.digitaldollhouse.com
+ * Development sponsored by just make IT! GbR - http://www.justmakeit.de/
  */
 
  
@@ -42,39 +42,26 @@ function uc_mbe4_payment_method() {
   $gateways[] = array(
     'id' => 'mbe4',
     'name' => 'mbe4 mobile payment',
-    'title' => t('mbe4 mobile payment'),
-    'review' => t('Easy and safe mobile payment.'),
+    'title' => t('mbe4 mobile payment. Easy payment with your mobile'),
+    'review' => t('mbe4 mobile payment'),
     'callback' => 'uc_payment_method_mbe4',
     'checkout' => TRUE,
     'weight' => 1,
     'no_gateway' => TRUE,
-
   );
-
   return $gateways;
 }
 
 function uc_payment_method_mbe4($op, &$arg1) {
   switch ($op) {
     case 'cart-details':
-      
-        if ($_SESSION['pay_method'] == 'mbe4') {
-          $sel[2] = ' selected="selected"';
-        }
-        else {
-          $sel[1] = ' selected="selected"';
-        }
-        unset($_SESSION['pay_method']);
-        $details = t('mobile payment');
-      
+      $details = t('Easy mobile payment with mbe4. Just enter your Mobile-Number and enter the received TAN.');      
       return $details;
-
     case 'cart-process':
-      $_SESSION['pay_method'] = $_POST['pay_method'];
       return;
-
-    case 'settings':
- $form['uc_mbe4_username'] = array(
+    case 'settings': // Settings-Formular
+    
+$form['uc_mbe4_username'] = array(
     '#type' => 'textfield',
     '#description'=>t('Enter your mbe4 Username'),
     '#title' => t('mbe4 Username:'),
@@ -123,11 +110,11 @@ function uc_payment_method_mbe4($op, &$arg1) {
     '#default_value'=>variable_get('uc_mbe4_url','https://billing.mbe4.de/widget/singlepayment'),
     '#required' => TRUE,
     );
-          $form['uc_mbe4_checkout_button'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Order review submit button text'),
-        '#description' => t('Provide 2Checkout specific text for the submit button on the order review page.'),
-        '#default_value' => variable_get('uc_2checkout_checkout_button', t('Submit Order')),
+	  $form['uc_mbe4_checkout_button'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Order review submit button text'),
+	'#description' => t('Provide 2Checkout specific text for the submit button on the order review page.'),
+	'#default_value' => variable_get('uc_2checkout_checkout_button', t('Submit Order')),
       );
   return $form;
   }
@@ -165,7 +152,7 @@ function uc_mbe4_form_alter(&$form, $form_state, $form_id) {
     $order = uc_order_load($order_id);
 
     if ($order->payment_method == 'mbe4') {
-      //drupal_add_css(drupal_get_path('module', 'uc_mbe4') .'/uc_mbe4.css');
+      drupal_add_css(drupal_get_path('module', 'uc_mbe4') .'/uc_mbe4.css');
       unset($form['submit']);
       $form['#prefix'] = '<table id="two-checkout-review-table"><tr><td>';
       $form['#suffix'] = '</td><td>'. drupal_get_form('uc_mbe4_form', $order) .'</td></tr></table>';
