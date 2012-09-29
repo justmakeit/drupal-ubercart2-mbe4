@@ -1,0 +1,11 @@
+name = mbe4 mobile payment
+description = mbe4 mobile payment gateway.
+dependencies[] = uc_payment
+files[] = mb4.api.php
+package = Ubercart - payment
+core = 6.x
+php = 5.0
+version = "6.x-0.1"
+
+
+

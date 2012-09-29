@@ -1,0 +1,342 @@
+<?php
+
+/**
+ * @file
+ * Process payments using Authorize.net. Supports AIM and ARB.
+ *
+ * Development sponsored by Digital Dollhouse - http://www.digitaldollhouse.com
+ */
+
+define('UC_AUTHORIZENET_TEST_GATEWAY_URL', 'https://test.authorize.net/gateway/transact.dll');
+define('UC_AUTHORIZENET_LIVE_GATEWAY_URL', 'https://secure.authorize.net/gateway/transact.dll');
+
+
+function uc_mbe4_init(){
+  module_load_include('php','uc_mbe4','mbe4.api');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function uc_mbe4_menu() {
+  $items = array();
+
+  $items['cart/mbe4/complete'] = array(
+    'page callback' => 'uc_mbe4_complete',
+    'access callback' => 'uc_mbe4_complete_access',
+    'type' => MENU_CALLBACK,
+    'file' => 'uc_mbe4.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Make sure anyone can complete their 2Checkout orders.
+ */
+function uc_mbe4_complete_access() {
+  return TRUE;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function uc_mbe4_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'uc_cart_checkout_review_form' && ($order_id = intval($_SESSION['cart_order'])) > 0) {
+    $order = uc_order_load($order_id);
+
+    if ($order->payment_method == 'mbe4') {
+      //drupal_add_css(drupal_get_path('module', 'uc_mbe4') .'/uc_mbe4.css');
+      unset($form['submit']);
+      $form['#prefix'] = '<table id="two-checkout-review-table"><tr><td>';
+      $form['#suffix'] = '</td><td>'. drupal_get_form('uc_mbe4_form', $order) .'</td></tr></table>';
+    }
+  }
+}
+
+
+/**
+ * Implements hook_payment_gateway().
+ */
+function uc_mbe4_payment_gateway() {
+  $gateways[] = array(
+    'id' => 'mbe4',
+    'title' => t('mbe4 mobile payment'),
+    'description' => t('Easy and safe mobile payment.'),
+    'settings' => 'uc_mbe4_settings_form',
+    'credit' => 'uc_mbe4_charge',
+    'checkout' => TRUE,
+    'weight' => 1,
+    'no_gateway' => FALSE,
+  );
+
+  return $gateways;
+}
+
+/**
+ * Implements hook_payment_method().
+ */
+function uc_mbe4_payment_method() {
+  $gateways[] = array(
+    'id' => 'mbe4',
+    'name' => 'mbe4 mobile payment',
+    'title' => t('mbe4 mobile payment'),
+    'review' => t('Easy and safe mobile payment.'),
+    'callback' => 'uc_payment_method_mbe4',
+    'checkout' => TRUE,
+    'weight' => 1,
+    'no_gateway' => TRUE,
+
+  );
+
+  return $gateways;
+}
+
+function uc_payment_method_mbe4($op, &$arg1) {
+  switch ($op) {
+    case 'cart-details':
+      
+        if ($_SESSION['pay_method'] == 'mbe4') {
+          $sel[2] = ' selected="selected"';
+        }
+        else {
+          $sel[1] = ' selected="selected"';
+        }
+        unset($_SESSION['pay_method']);
+        $details = t('mobile payment');
+      
+      return $details;
+
+    case 'cart-process':
+      $_SESSION['pay_method'] = $_POST['pay_method'];
+      return;
+
+    case 'settings':
+ $form['uc_mbe4_username'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Username'),
+    '#title' => t('mbe4 Username:'),
+    '#default_value'=>variable_get('uc_mbe4_username',''),
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_password'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Password'),
+    '#title' => t('mbe4 Password:'),
+    '#default_value'=>variable_get('uc_mbe4_password',''),
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_clientid'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Client ID'),
+    '#title' => t('mbe4 Client ID:'),
+    '#default_value'=>variable_get('uc_mbe4_clientid',''),
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_serviceid'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Service ID'),
+    '#title' => t('mbe4 Service ID:'),
+    '#default_value'=>variable_get('uc_mbe4_serviceid',''),
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_contentclass'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Content Class'),
+    '#title' => t('mbe4 Content Class:'),
+    '#default_value'=>variable_get('uc_mbe4_contentclass',''),
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_extracharge'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your Extra Charge in % without trailing %-Symbol. To disable, just enter 0.'),
+    '#title' => t('mbe4 Extra Charge:'),
+    '#default_value'=>variable_get('uc_mbe4_extracharge',''),
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_url'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter the mbe4 URL'),
+    '#title' => t('mbe4 URL:'),
+    '#default_value'=>variable_get('uc_mbe4_url','https://billing.mbe4.de/widget/singlepayment'),
+    '#required' => TRUE,
+    );
+          $form['uc_mbe4_checkout_button'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Order review submit button text'),
+        '#description' => t('Provide 2Checkout specific text for the submit button on the order review page.'),
+        '#default_value' => variable_get('uc_2checkout_checkout_button', t('Submit Order')),
+      );
+  return $form;
+  }
+  }
+  
+function uc_mbe4_complete($cart_id = 0) {
+ watchdog('2Checkout', 'Receiving new order notification for order !order_id.', array('!order_id' => check_plain($_GET['clienttransactionid'])));
+
+  $order = uc_order_load($_GET['clienttransactionid']);
+
+  if ($_GET['responsecode'] == '0' ) {
+    $comment = t('Paid by !type, mbe4 order #!order.');
+    uc_payment_enter($order->order_id, 'mbe4', $order->order_total, 0, NULL, $comment);
+  }
+
+  // Empty that cart...
+  uc_order_save($order);
+
+  // Add a comment to let sales team know this came in through the site.
+  uc_order_comment_save($order->order_id, 0, t('Order created through website.'), 'admin');
+  uc_cart_empty($cart_id);
+
+  $output = uc_cart_complete_sale($order, variable_get('uc_new_customer_login', FALSE));
+
+  $page = variable_get('uc_cart_checkout_complete_page', '');
+
+  if (!empty($page)) {
+    drupal_goto($page);
+  }
+
+  return $output;
+
+}
+                         
+
+function uc_mbe4_form($form_state, $order) {
+  new mbe4(variable_get('uc_mbe4_username',''), variable_get('uc_mbe4_password',''), variable_get('uc_mbe4_clientid',''), variable_get('uc_mbe4_serviceid',''), variable_get('uc_mbe4_url','')) 
+  // Transaktion vorbereiten
+  $data = mbe4->create_transaction(
+		  $order->order_id, 
+		  $description,
+		  $order->order_total * 100,
+		  variable_get('uc_mbe4_contentclass','1'),
+		  url('cart/mbe4/complete/'. uc_cart_get_id(), array('absolute' => TRUE)),
+		  TRUE
+		  );
+  
+  variable_get('uc_mbe4_serviceid',''), url('cart/mbe4/complete/'. uc_cart_get_id(), array('absolute' => TRUE)));
+  $description = t('Order @order_number at @store', array('@order_number' => $order->order_id, '@store' => variable_get('site_name', url('<front>', array('absolute' => TRUE)))));
+  
+  $timestamp=date("Y-m-d")."T".date("H:i:s.000")."Z";
+
+  $clienttransactionid=$order->order_id;
+
+  $hashbase=
+      variable_get('uc_mbe4_password','') .
+      variable_get('uc_mbe4_username','') .
+      variable_get('uc_mbe4_clientid','') .
+      variable_get('uc_mbe4_serviceid','') .
+      variable_get('uc_mbe4_contentclass','') .
+      $description .
+      $clienttransactionid .
+      $order->order_total * 100 .
+      url('cart/mbe4/complete/'. uc_cart_get_id(), array('absolute' => TRUE)) .
+      $timestamp;      
+  // hash erzeugen
+  $hashparam=md5($hashbase);
+  
+  // Build the data array that will be translated into hidden form values.
+  // NOTE: keys should be uppercase for the SHA-1 security string
+  $data = array(
+    // General parameters
+    'username' => variable_get('uc_mbe4_username',''),
+    'clientid' => variable_get('uc_mbe4_clientid',''),
+    'serviceid' => variable_get('uc_mbe4_serviceid',''),
+    'contentclass' => variable_get('uc_mbe4_contentclass',''),
+    'description' => $description,
+    'clienttransactionid' => $clienttransactionid,
+    'amount' => $order->order_total * 100, // mbe4 wants ct, no eur
+    'callbackurl' => url('cart/mbe4/complete/'. uc_cart_get_id(), array('absolute' => TRUE)),
+    'timestamp' => $timestamp,
+    'hash' => urlencode($hashparam),
+  );
+
+  $form['#action'] = variable_get('uc_mbe4_url', '');
+  $form['#method'] = 'get';
+
+  foreach ($data as $name => $value) {
+    $form[$name] = array('#type' => 'hidden', '#value' => $value);
+  }
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => variable_get('uc_mbe4_checkout_button', t('Submit Order')),
+  );
+
+  return $form;
+
+}
+
+/**
+ * Callback for payment gateway settings.
+ */
+function uc_mbe4_settings_form() {
+ // $login_data = _uc_mbe4_login_data();
+
+ $form['uc_mbe4_username'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Username'),
+    '#title' => t('mbe4 Username:'),
+    '#default_value'=>$settings['uc_mbe4_username'],
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_password'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Password'),
+    '#title' => t('mbe4 Password:'),
+    '#default_value'=>$settings['uc_mbe4_password'],
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_clientid'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Client ID'),
+    '#title' => t('mbe4 Client ID:'),
+    '#default_value'=>$settings['uc_mbe4_clientid'],
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_serviceid'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Service ID'),
+    '#title' => t('mbe4 Service ID:'),
+    '#default_value'=>$settings['uc_mbe4_serviceid'],
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_contentclass'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your mbe4 Content Class'),
+    '#title' => t('mbe4 Content Class:'),
+    '#default_value'=>$settings['uc_mbe4_contentclass'],
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_extracharge'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter your Extra Charge in % without trailing %-Symbol. To disable, just enter 0.'),
+    '#title' => t('mbe4 Extra Charge:'),
+    '#default_value'=>$settings['uc_mbe4_extracharge'],
+    '#required' => TRUE,
+    );
+    $form['uc_mbe4_url'] = array(
+    '#type' => 'textfield',
+    '#description'=>t('Enter the mbe4 URL'),
+    '#title' => t('mbe4 URL:'),
+    '#default_value'=>$settings['uc_mbe4_url'],
+    '#required' => TRUE,
+    );
+  return $form;
+}
+
+// Submit handler for payment gateway settings form to encrypt fields.
+function uc_mbe4_payment_gateway_settings_submit($form, &$form_state) {
+  // If CC encryption has been configured properly.
+  if ($key = uc_credit_encryption_key()) {
+    // Setup our encryption object.
+    $crypt = new uc_encryption_class();
+
+    // Encrypt the Login ID, Transaction key, and MD5 Hash.
+    if (!empty($form_state['values']['uc_authnet_md5_hash'])) {
+      variable_set('uc_authnet_md5_hash', $crypt->encrypt($key, $form_state['values']['uc_authnet_md5_hash']));
+    }
+
+    // Store any errors.
+    uc_store_encryption_errors($crypt, 'uc_mbe4');
+  }
+}
+
