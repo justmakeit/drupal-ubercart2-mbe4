@@ -7,10 +7,7 @@
  * Development sponsored by Digital Dollhouse - http://www.digitaldollhouse.com
  */
 
-define('UC_AUTHORIZENET_TEST_GATEWAY_URL', 'https://test.authorize.net/gateway/transact.dll');
-define('UC_AUTHORIZENET_LIVE_GATEWAY_URL', 'https://secure.authorize.net/gateway/transact.dll');
-
-
+ 
 function uc_mbe4_init(){
   module_load_include('php','uc_mbe4','mbe4.api');
 }
@@ -36,27 +33,6 @@ function uc_mbe4_menu() {
  */
 function uc_mbe4_complete_access() {
   return TRUE;
-}
-
-
-
-
-/**
- * Implements hook_payment_gateway().
- */
-function uc_mbe4_payment_gateway() {
-  $gateways[] = array(
-    'id' => 'mbe4',
-    'title' => t('mbe4 mobile payment'),
-    'description' => t('Easy and safe mobile payment.'),
-    'settings' => 'uc_mbe4_settings_form',
-    'credit' => 'uc_mbe4_charge',
-    'checkout' => TRUE,
-    'weight' => 1,
-    'no_gateway' => FALSE,
-  );
-
-  return $gateways;
 }
 
 /**
@@ -234,79 +210,3 @@ function uc_mbe4_form($form_state, $order) {
   // Formular zurück geben
   return $form;
 }
-
-/**
- * Callback for payment gateway settings.
- */
-function uc_mbe4_settings_form() {
- // $login_data = _uc_mbe4_login_data();
-
- $form['uc_mbe4_username'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter your mbe4 Username'),
-    '#title' => t('mbe4 Username:'),
-    '#default_value'=>$settings['uc_mbe4_username'],
-    '#required' => TRUE,
-    );
-    $form['uc_mbe4_password'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter your mbe4 Password'),
-    '#title' => t('mbe4 Password:'),
-    '#default_value'=>$settings['uc_mbe4_password'],
-    '#required' => TRUE,
-    );
-    $form['uc_mbe4_clientid'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter your mbe4 Client ID'),
-    '#title' => t('mbe4 Client ID:'),
-    '#default_value'=>$settings['uc_mbe4_clientid'],
-    '#required' => TRUE,
-    );
-    $form['uc_mbe4_serviceid'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter your mbe4 Service ID'),
-    '#title' => t('mbe4 Service ID:'),
-    '#default_value'=>$settings['uc_mbe4_serviceid'],
-    '#required' => TRUE,
-    );
-    $form['uc_mbe4_contentclass'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter your mbe4 Content Class'),
-    '#title' => t('mbe4 Content Class:'),
-    '#default_value'=>$settings['uc_mbe4_contentclass'],
-    '#required' => TRUE,
-    );
-    $form['uc_mbe4_extracharge'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter your Extra Charge in % without trailing %-Symbol. To disable, just enter 0.'),
-    '#title' => t('mbe4 Extra Charge:'),
-    '#default_value'=>$settings['uc_mbe4_extracharge'],
-    '#required' => TRUE,
-    );
-    $form['uc_mbe4_url'] = array(
-    '#type' => 'textfield',
-    '#description'=>t('Enter the mbe4 URL'),
-    '#title' => t('mbe4 URL:'),
-    '#default_value'=>$settings['uc_mbe4_url'],
-    '#required' => TRUE,
-    );
-  return $form;
-}
-
-// Submit handler for payment gateway settings form to encrypt fields.
-function uc_mbe4_payment_gateway_settings_submit($form, &$form_state) {
-  // If CC encryption has been configured properly.
-  if ($key = uc_credit_encryption_key()) {
-    // Setup our encryption object.
-    $crypt = new uc_encryption_class();
-
-    // Encrypt the Login ID, Transaction key, and MD5 Hash.
-    if (!empty($form_state['values']['uc_authnet_md5_hash'])) {
-      variable_set('uc_authnet_md5_hash', $crypt->encrypt($key, $form_state['values']['uc_authnet_md5_hash']));
-    }
-
-    // Store any errors.
-    uc_store_encryption_errors($crypt, 'uc_mbe4');
-  }
-}
-
