@@ -141,6 +141,8 @@ function uc_mbe4_complete($cart_id = 0) {
   }
   else
       watchdog('uc_mbe4_transaction',"mbe4 transaction failed: ". $mbe4obj->get_responsemsg_by_responsecode($result));
+      drupal_set_message('mbe4 transaction failed!','error');
+      drupal_goto('cart/checkout/review');
   return $output;
 }
              
