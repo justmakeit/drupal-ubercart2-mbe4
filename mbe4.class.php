@@ -1,13 +1,6 @@
 <?php
 
 class mbe4 {
-//   var $mbe4_username;
-//   var $mbe4_password; 
-//   var $mbe4_clientid;
-//   var $mbe4_serviceid;
-//   var $mbe4_contentclass;
-//   var $mbe4_url;
-  
   function __construct($username, $password, $clientid, $serviceid, $url="https://billing.mbe4.de/widget/singlepayment") {
       $this->username = $username;
       $this->password = $password;

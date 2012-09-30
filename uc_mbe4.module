@@ -9,7 +9,8 @@
 
  
 function uc_mbe4_init(){
-  module_load_include('php','uc_mbe4','mbe4.api');
+  module_load_include('php','uc_mbe4','mbe4.class');
+  drupal_add_css(drupal_get_path('module', 'uc_mbe4') .'/uc_mbe4.css');
 }
 
 /**
@@ -17,19 +18,18 @@ function uc_mbe4_init(){
  */
 function uc_mbe4_menu() {
   $items = array();
-
+  // Callback-Pfad für Redirect von mbe4
   $items['cart/mbe4/complete'] = array(
     'page callback' => 'uc_mbe4_complete',
     'access callback' => 'uc_mbe4_complete_access',
     'type' => MENU_CALLBACK,
     'file' => 'uc_mbe4.pages.inc',
   );
-
   return $items;
 }
 
 /**
- * Make sure anyone can complete their 2Checkout orders.
+ * Make sure anyone can complete their mbe4 orders.
  */
 function uc_mbe4_complete_access() {
   return TRUE;
@@ -39,10 +39,12 @@ function uc_mbe4_complete_access() {
  * Implements hook_payment_method().
  */
 function uc_mbe4_payment_method() {
+  global $base_path;
+  $logo = '<img id="mbe4-logo" src="'. $base_path . drupal_get_path('module','uc_mbe4'). '/mbe4_logo_xs.png"/>';
   $gateways[] = array(
     'id' => 'mbe4',
     'name' => 'mbe4 mobile payment',
-    'title' => t('mbe4 mobile payment. Easy payment with your mobile'),
+    'title' => '<span id="mbe4-title">'. t('mbe4 mobile payment') .'<br/><span id="mbe4-subtitle">'. t('Easy payment with your mobile').'</span></span>',
     'review' => t('mbe4 mobile payment'),
     'callback' => 'uc_payment_method_mbe4',
     'checkout' => TRUE,
@@ -113,7 +115,7 @@ $form['uc_mbe4_username'] = array(
 	  $form['uc_mbe4_checkout_button'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Order review submit button text'),
-	'#description' => t('Provide 2Checkout specific text for the submit button on the order review page.'),
+	'#description' => t('Provide mbe4 specific text for the submit button on the order review page.'),
 	'#default_value' => variable_get('uc_2checkout_checkout_button', t('Submit Order')),
       );
   return $form;
