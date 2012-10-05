@@ -1,15 +1,15 @@
 #mbe4-title {
-  background: url('./mbe4_logo_xs.png') no-repeat;
-  padding: 0 0 0 70px;
-  font-weight:bold;
-  display:inline-block;
-  height: 35px;
+    background: url('./mbe4_logo_xs.png') no-repeat;
+    padding: 0 0 0 70px;
+    font-weight:bold;
+    display:inline-block;
+    height: 35px;
 } 
 #mbe4-subtitle {
-  font-size:90%;
+    font-size:90%;
     font-weight:normal;
 
 } 
 #edit-panes-payment-payment-method-mbe4-wrapper{
-  
+
 }
