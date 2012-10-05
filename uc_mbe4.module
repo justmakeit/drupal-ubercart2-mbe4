@@ -11,7 +11,7 @@
  * Implements hook_init().
  */
 function uc_mbe4_init() {
-  module_load_include('php', 'uc_mbe4', 'mbe4.class');
+  module_load_include('inc', 'uc_mbe4', 'mbe4.class');
   drupal_add_css(drupal_get_path('module', 'uc_mbe4') . '/uc_mbe4.css');
 }
 
