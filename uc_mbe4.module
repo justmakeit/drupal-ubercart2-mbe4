@@ -57,15 +57,16 @@ function uc_mbe4_payment_method() {
 }
 /**
  * Payment method declaration
+ *
  */
-function uc_payment_method_mbe4($op, &$arg1) {
+function  uc_payment_method_mbe4($op, &$arg1) {
   switch ($op) {
     case 'cart-details':
       $details = t('Easy mobile payment with mbe4. Just enter your Mobile-Number and enter the received TAN.');
       return $details;
     case 'cart-process':
       return;
-    case 'settings': // Settings-Formular
+    case 'settings':
       $form['uc_mbe4_username'] = array(
           '#type' => 'textfield',
           '#description'=> t('Enter your mbe4 Username'),
@@ -121,7 +122,7 @@ function uc_payment_method_mbe4($op, &$arg1) {
           '#description' => t('Provide mbe4 specific text for the submit button on the order review page.'),
           '#default_value' => variable_get('uc_2checkout_checkout_button', t('Submit Order')),
           );
-      return $form;
+      return $form; 
     }
   }
 
@@ -130,9 +131,9 @@ function uc_payment_method_mbe4($op, &$arg1) {
  */
 function uc_mbe4_complete($cart_id = 0) {
   // Erstellung mbe4-Objekt
-  $mbe4obj = new mbe4(variable_get('uc_mbe4_username',''), variable_get('uc_mbe4_password',''), variable_get('uc_mbe4_clientid',''), variable_get('uc_mbe4_serviceid',''), variable_get('uc_mbe4_url',''));
+  $mbe4obj = new Mbe4(variable_get('uc_mbe4_username', ''), variable_get('uc_mbe4_password', ''), variable_get('uc_mbe4_clientid', ''), variable_get('uc_mbe4_serviceid', ''), variable_get('uc_mbe4_url', ''));
   // Validierung der Parameter
-  $result = $mbe4obj->validate_transaction($_GET, variable_get('uc_mbe4_password',''));
+  $result = $mbe4obj->validate_transaction($_GET, variable_get('uc_mbe4_password', ''));
   // Ist die Transaktion gültig?
   if ($mbe4obj->is_valid_responsecode($result)) {
     $comment = t('Paid by !type, mbe4 order #!order.');
@@ -145,11 +146,11 @@ function uc_mbe4_complete($cart_id = 0) {
     $output = uc_cart_complete_sale($order, variable_get('uc_new_customer_login', FALSE));
     $page = variable_get('uc_cart_checkout_complete_page', '');
     if (!empty($page)) 
-	drupal_goto($page);
-  }
-  else
-      watchdog('uc_mbe4_transaction',"mbe4 transaction failed: ". $mbe4obj->get_responsemsg_by_responsecode($result));
-      drupal_set_message('mbe4 transaction failed!','error');
+      drupal_goto($page);
+    }
+    else
+      watchdog('uc_mbe4_transaction',"mbe4 transaction failed: " . $mbe4obj->get_responsemsg_by_responsecode($result));
+      drupal_set_message('mbe4 transaction failed!', 'error');
       drupal_goto('cart/checkout/review');
   return $output;
 }
@@ -161,10 +162,10 @@ function uc_mbe4_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'uc_cart_checkout_review_form' && ($order_id = intval($_SESSION['cart_order'])) > 0) {
     $order = uc_order_load($order_id);
     if ($order->payment_method == 'mbe4') {
-      drupal_add_css(drupal_get_path('module', 'uc_mbe4') .'/uc_mbe4.css');
+      drupal_add_css(drupal_get_path('module', 'uc_mbe4') . '/uc_mbe4.css');
       unset($form['submit']);
       $form['#prefix'] = '<table id="two-checkout-review-table"><tr><td>';
-      $form['#suffix'] = '</td><td>'. drupal_get_form('uc_mbe4_form', $order) .'</td></tr></table>';
+      $form['#suffix'] = '</td><td>' . drupal_get_form('uc_mbe4_form', $order) . '</td></tr></table>';
     }
   }
 }
@@ -177,7 +178,7 @@ function uc_mbe4_form_alter(&$form, $form_state, $form_id) {
  */
 function uc_mbe4_form($form_state, $order) {
   // mbe4-Objekt erstellen
-  $mbe4obj = new mbe4(variable_get('uc_mbe4_username',''), variable_get('uc_mbe4_password',''), variable_get('uc_mbe4_clientid',''), variable_get('uc_mbe4_serviceid',''), variable_get('uc_mbe4_url',''));
+  $mbe4obj = new Mbe4(variable_get('uc_mbe4_username', ''), variable_get('uc_mbe4_password', ''), variable_get('uc_mbe4_clientid', ''), variable_get('uc_mbe4_serviceid', ''), variable_get('uc_mbe4_url', ''));
   // Beschreibung für die Transaktion vorbereiten
   $description = t('Order @order_number at @store', array('@order_number' => $order->order_id, '@store' => variable_get('site_name', url('<front>', array('absolute' => TRUE)))));
   // Transaktion vorbereiten
