@@ -58,7 +58,7 @@ function uc_mbe4_payment_method() {
 /**
  * Payment method declaration.
  */
-function  uc_payment_method_mbe4 ($op, &$arg1) {
+function uc_payment_method_mbe4($op, &$arg1) {
   switch ($op) {
     case 'cart-details':
       $details = t('Easy mobile payment with mbe4. Just enter your Mobile-Number and enter the received TAN.');
@@ -82,7 +82,7 @@ function  uc_payment_method_mbe4 ($op, &$arg1) {
       );
       $form['uc_mbe4_clientid'] = array(
         '#type' => 'textfield',
-        '#description' =>t('Enter your mbe4 Client ID'),
+        '#description' => t('Enter your mbe4 Client ID'),
         '#title' => t('mbe4 Client ID:'),
         '#default_value' => variable_get('uc_mbe4_clientid', ''),
         '#required' => TRUE,
@@ -129,27 +129,27 @@ function  uc_payment_method_mbe4 ($op, &$arg1) {
  * Complete Checkout.
  */
 function uc_mbe4_complete($cart_id = 0) {
-  // Erstellung mbe4-Objekt
+  // Erstellung mbe4-Objekt.
   $mbe4obj = new Mbe4(variable_get('uc_mbe4_username', ''), variable_get('uc_mbe4_password', ''), variable_get('uc_mbe4_clientid', ''), variable_get('uc_mbe4_serviceid', ''), variable_get('uc_mbe4_url', ''));
-  // Validierung der Parameter
+  // Validierung der Parameter.
   $result = $mbe4obj->validate_transaction($_GET, variable_get('uc_mbe4_password', ''));
   // Ist die Transaktion gültig?.
   if ($mbe4obj->is_valid_responsecode($result)) {
     $comment = t('Paid by !type, mbe4 order #!order.');
     uc_payment_enter($order->order_id, 'mbe4', $order->order_total, 0, NULL, $comment);
-    // Empty that cart...
+    // Empty that cart.
     uc_order_save($order);
     // Add a comment to let sales team know this came in through the site.
     uc_order_comment_save($order->order_id, 0, t('Order created through website.'), 'admin');
     uc_cart_empty($cart_id);
     $output = uc_cart_complete_sale($order, variable_get('uc_new_customer_login', FALSE));
     $page = variable_get('uc_cart_checkout_complete_page', '');
-    if (!empty($page)) { 
+    if (!empty($page)) {
       drupal_goto($page);
     }
   }
   else {
-    watchdog('uc_mbe4_transaction',"mbe4 transaction failed: " . $mbe4obj->get_responsemsg_by_responsecode($result));
+    watchdog('uc_mbe4_transaction', "mbe4 transaction failed: " . $mbe4obj->get_responsemsg_by_responsecode($result));
     drupal_set_message('mbe4 transaction failed!', 'error');
     drupal_goto('cart/checkout/review');
     return $output;
@@ -172,26 +172,26 @@ function uc_mbe4_form_alter(&$form, $form_state, $form_id) {
 }
 
 /*
- *	Formular für Payment-Redirect erstellen. Wird von hook_form_alter aufgerufen und 
- *	integriert die Formularfelder in das Review-Checkout-Formular
+ *	Formular für Payment-Redirect erstellen. Wird von hook_form_alter aufgerufen
+ *	und integriert die Formularfelder in das Review-Checkout-Formular.
  *	@return:
  *		Komplettes Redirect-Formular mit Key/Value-Array.
  */
 function uc_mbe4_form($form_state, $order) {
   // mbe4-Objekt erstellen
   $mbe4obj = new Mbe4(variable_get('uc_mbe4_username', ''), variable_get('uc_mbe4_password', ''), variable_get('uc_mbe4_clientid', ''), variable_get('uc_mbe4_serviceid', ''), variable_get('uc_mbe4_url', ''));
-  // Beschreibung für die Transaktion vorbereiten
+  // Beschreibung für die Transaktion vorbereiten.
   $description = t('Order @order_number at @store', array('@order_number' => $order->order_id, '@store' => variable_get('site_name', url('<front>', array('absolute' => TRUE)))));
-  // Transaktion vorbereiten
+  // Transaktion vorbereiten.
   $data = $mbe4obj->create_transaction(
-		  $order->order_id, 
-		  $description,
-		  $order->order_total * 100,
-		  variable_get('uc_mbe4_contentclass','1'),
-		  url('cart/mbe4/complete/'. uc_cart_get_id(), array('absolute' => TRUE)),
-		  TRUE
-		  );
-  // Formular erstellen
+      $order->order_id,
+      $description,
+      $order->order_total * 100,
+      variable_get('uc_mbe4_contentclass', '1'),
+      url('cart/mbe4/complete/' . uc_cart_get_id(), array('absolute' => TRUE)),
+      TRUE
+      );
+  // Formular erstellen.
   $form['#action'] = variable_get('uc_mbe4_url', '');
   $form['#method'] = 'get';
   // $data-Array als Formularfelder hinzufügen.
@@ -202,6 +202,6 @@ function uc_mbe4_form($form_state, $order) {
     '#type' => 'submit',
     '#value' => variable_get('uc_mbe4_checkout_button', t('Submit Order')),
   );
-  // Formular zurück geben
+  // Formular zurück geben.
   return $form;
 }
