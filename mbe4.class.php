@@ -1,6 +1,12 @@
 <?php
+/**
+ * @file
+ * Process payments easy using mbe4 mobile payment.
+ *
+ * Development sponsored by just make IT! GbR - http://www.justmakeit.de/
+ */
 
-class mbe4 {
+class Mbe4 {
   function __construct($username, $password, $clientid, $serviceid, $url="https://billing.mbe4.de/widget/singlepayment") {
       $this->username = $username;
       $this->password = $password;

@@ -171,14 +171,14 @@ function uc_mbe4_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
-/*
+/**
  *	Formular für Payment-Redirect erstellen. Wird von hook_form_alter aufgerufen
  *	und integriert die Formularfelder in das Review-Checkout-Formular.
  *	@return:
  *		Komplettes Redirect-Formular mit Key/Value-Array.
  */
 function uc_mbe4_form($form_state, $order) {
-  // mbe4-Objekt erstellen
+  // mbe4-Objekt erstellen.
   $mbe4obj = new Mbe4(variable_get('uc_mbe4_username', ''), variable_get('uc_mbe4_password', ''), variable_get('uc_mbe4_clientid', ''), variable_get('uc_mbe4_serviceid', ''), variable_get('uc_mbe4_url', ''));
   // Beschreibung für die Transaktion vorbereiten.
   $description = t('Order @order_number at @store', array('@order_number' => $order->order_id, '@store' => variable_get('site_name', url('<front>', array('absolute' => TRUE)))));
