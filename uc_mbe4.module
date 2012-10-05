@@ -7,10 +7,12 @@
  * Development sponsored by just make IT! GbR - http://www.justmakeit.de/
  */
 
- 
-function uc_mbe4_init(){
-  module_load_include('php','uc_mbe4','mbe4.class');
-  drupal_add_css(drupal_get_path('module', 'uc_mbe4') .'/uc_mbe4.css');
+/**
+* Implements hook_init().
+*/
+function uc_mbe4_init() {
+  module_load_include('php', 'uc_mbe4', 'mbe4.class');
+  drupal_add_css(drupal_get_path('module', 'uc_mbe4') . '/uc_mbe4.css');
 }
 
 /**
