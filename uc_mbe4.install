@@ -1,0 +1,15 @@
+<?php 
+/**
+ * hook_uninstall
+ */
+function uc_mbe4_uninstall(){
+  // Delete all uc_mbe4-variables.
+  variable_del('uc_mbe4_url');
+  variable_del('uc_mbe4_username');
+  variable_del('uc_mbe4_password');
+  variable_del('uc_mbe4_serviceid');
+  variable_del('uc_mbe4_clientid');
+  variable_del('uc_mbe4_contentclass');
+  variable_del('uc_mbe4_extracharge');
+}
+
