@@ -15,32 +15,11 @@ class Mbe4 {
       $this->url = $url;
   }
 
-  /*
+  /**
   *  Senden der Daten an mbe4.
   *  params: 
   *   $amount: Die Transaktionssumme in EUR
   *   $contentid: Die Art des zu Buchenden Contents.
-  *		1: News/Info
-  *		2. Chat/Flirt
-  *		3. Game
-  *		4. Klingelton
-  *		5. Bild/Logo
-  *		6. Videoclip
-  *		7. Musikdatei
-  *		8. Lokalisierung
-  *		9. Voting
-  *		10. Gewinnspiel
-  *		11. Portal Zugang
-  *		12. Software
-  *		13. Dokument
-  *		14. Ticket
-  *		15. Horoskop
-  *		16. Freizeit
-  *		17. Unterwegs
-  *		18. Finanzen
-  *		19. Shopping
-  *		20. E-Mail
-  *		21. Spende
   *  return:
   *	Liefert ein Key/Value-Array zurück, welches per GET an mbe4 übertragen werden muss.
   *
