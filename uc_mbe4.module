@@ -30,10 +30,22 @@ function uc_mbe4_menu() {
 }
 
 /**
+ * Implements hook_perm().
+ */
+function uc_mbe4_perm(){
+  return array('complete checkout with mbe4 payment');
+}
+/**
  * Make sure anyone can complete their mbe4 orders.
  */
 function uc_mbe4_complete_access() {
-  return TRUE;
+  // Is user allowed to do this?
+  if (user_access('complete checkout with mbe4 payment')) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
 }
 
 /**
