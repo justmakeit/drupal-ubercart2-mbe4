@@ -25,7 +25,6 @@ function uc_mbe4_menu() {
     'page callback' => 'uc_mbe4_complete',
     'access callback' => 'uc_mbe4_complete_access',
     'type' => MENU_CALLBACK,
-    'file' => 'uc_mbe4.pages.inc',
   );
   return $items;
 }
