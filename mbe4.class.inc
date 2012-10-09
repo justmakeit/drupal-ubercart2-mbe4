@@ -93,8 +93,7 @@ class Mbe4 {
    * 	  Response-Code, 0 means everything is fine
    *
    */
-
-  public function validate_transaction($mbe4_params, $mbe4_password) {
+  public function validateTransaction($mbe4_params, $mbe4_password) {
     // check hash Signierung
     $hashbase =
         $mbe4_password .
@@ -113,14 +112,20 @@ class Mbe4 {
     return $mbe4_params["responsecode"]; 
   }
 
-  public function is_valid_responsecode($responsecode) {
+  /**
+   * Is the response-code valid?
+   */
+  public function isValidResponsecode($responsecode) {
     if ($responsecode == 0)
       return TRUE;
     else
       return FALSE;
   }
 
-  public function get_responsemsg_by_responsecode($responsecode) {
+  /**
+   * Get the Response-Message by Responsecode
+   */
+  public function getResponsemsgByResponsecode($responsecode) {
     switch ($responsecode) {
       case 0: return('OK');
       case 1: return('NOT FINAL – request was processed successfully but the answer is not final. (e.g. a TAN was sent to the subscriber and tan received must be called)');
