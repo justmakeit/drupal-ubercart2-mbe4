@@ -24,16 +24,16 @@ class Mbe4 {
 
   /**
    *  Send transaction to mbe4.
-   * 
+   *
    *  @param float $amount
-   *    The amount to pay
-   * 
+   *  The amount to pay
+   *
    *  @param int $contentid
-   *    The mbe4-contentclass, look at readme.txt for more informations.
-  
+   *  The mbe4-contentclass, look at readme.txt for more informations.
+   *
    *  @return: key/value-Array
    */
-  function create_transaction($id, $description="mbe4 payment", $amount=0, $contentclass=1, $returnurl="", $urlencode=TRUE) {
+  function createTransaction($id, $description="mbe4 payment", $amount=0, $contentclass=1, $returnurl="", $urlencode=TRUE) {
     // Generate Timestamp.
     $timestamp = date("Y-m-d") . "T" . date("H:i:s.000") . "Z";
     // Generate Hashbase.

@@ -193,7 +193,7 @@ function uc_mbe4_form($form_state, $order) {
   // Beschreibung für die Transaktion vorbereiten.
   $description = t('Order @order_number at @store', array('@order_number' => $order->order_id, '@store' => variable_get('site_name', url('<front>', array('absolute' => TRUE)))));
   // Transaktion vorbereiten.
-  $data = $mbe4obj->create_transaction(
+  $data = $mbe4obj->createTransaction(
       $order->order_id,
       $description,
       $order->order_total * 100,
