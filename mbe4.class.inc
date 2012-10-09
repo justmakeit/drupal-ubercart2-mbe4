@@ -11,7 +11,9 @@
  * MBE4-Class Definition
  */
 class Mbe4 {
-  // Construct-Funktion, define some variables.
+  /**
+   * Construct-Function, set some variables.
+   */
   function __construct($username, $password, $clientid, $serviceid, $url="https://billing.mbe4.de/widget/singlepayment") {
     $this->username = $username;
     $this->password = $password;
@@ -21,15 +23,15 @@ class Mbe4 {
   }
 
   /**
-   *  Senden der Daten an mbe4.
-   *  params: 
-   *   $amount: Die Transaktionssumme in EUR
+   *  Send transaction to mbe4.
+   *   @param float $amount
+   *     The amount to pay
+   *   @param int $contentid
+   *     The mbe4-contentclass, look at readme.txt for more informations.
    *   $contentid: Die Art des zu Buchenden Contents.
-   *  return:
-   * 	Liefert ein Key/Value-Array zurück, welches per GET an mbe4 übertragen werden muss.
-   *
+   *  @return: key/value-Array
    */
-  function create_transaction($id, $description="mbe4 payment", $amount, $contentclass=1, $returnurl, $urlencode=TRUE) {
+  function create_transaction($id, $description="mbe4 payment", $amount=0, $contentclass=1, $returnurl="", $urlencode=TRUE) {
     // Timestamp generieren
     $timestamp = date("Y-m-d") . "T" . date("H:i:s.000") . "Z";
     // Hashbase definieren
