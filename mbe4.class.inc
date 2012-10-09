@@ -28,16 +28,22 @@ class Mbe4 {
    *  @param float $amount
    *  The amount to pay
    *
-   *  @param int $contentid
+   *  @param int $contentclass
    *  The mbe4-contentclass, look at readme.txt for more informations.
+   * 
+   *  @param string $returnurl
+   *  The mbe4-return-url. After redirect to mbe4.
+   *  @param bool $urlencode
+   *  Should the GET-Url be encoded with urlencode()?
    *
    *  @return: key/value-Array
    */
-  function createTransaction($id, $description="mbe4 payment", $amount=0, $contentclass=1, $returnurl="", $urlencode=TRUE) {
+  public function createTransaction($id, $description="mbe4 payment", $amount=0, $contentclass=1, $returnurl="", $urlencode=TRUE) {
     // Generate Timestamp.
     $timestamp = date("Y-m-d") . "T" . date("H:i:s.000") . "Z";
     // Generate Hashbase.
-    $hashbase =
+    $hashbase 
+        =
         $this->password .
         $this->username .
         $this->clientid .
@@ -52,17 +58,17 @@ class Mbe4 {
     $hashparam = md5($hashbase);
     // Build the data array that will be translated into hidden form values.
     $data = array(
-        // General parameters.
-        'username' => $this->username,
-        'clientid' => $this->clientid,
-        'serviceid' => $this->serviceid,
-        'contentclass' => $contentclass,
-        'description' => $description,
-        'clienttransactionid' => $id,
-        'amount' => $amount, // mbe4 wants ct, no eur
-        'callbackurl' => $returnurl,
-        'timestamp' => $timestamp,
-        'hash' => $hashparam,
+      // General parameters.
+      'username' => $this->username,
+      'clientid' => $this->clientid,
+      'serviceid' => $this->serviceid,
+      'contentclass' => $contentclass,
+      'description' => $description,
+      'clienttransactionid' => $id,
+      'amount' => $amount, // mbe4 wants ct, no eur.
+      'callbackurl' => $returnurl,
+      'timestamp' => $timestamp,
+      'hash' => $hashparam,
     );
     // Sollen die Werte mit urlencode() codiert werden?
     if ($urlencode == TRUE) {
@@ -74,20 +80,20 @@ class Mbe4 {
   }
 
   /** 	
-   * validate_transaction($mbe4_params)
+   * Function validate_transaction($mbe4_params).
    * 
    * Validierung der Zahlung. Dafür werden die von mbe4 übergebenen Parameter 
    * plus das mbe4-Password hintereinander gehängt und eine MD5-Summe aus dem 
    * String erstellt.
-   * 
-   * param array $mbe4_params:
-   * 		$mbe4_params: Key-Value-Array aus dem per GET übergebenen Parametern
-   * 	return:
-   * 		Response-Code, 0 bedeutet erfolgreiche Zahlung
+   *
+   *  @param array $mbe4_params
+   *  $mbe4_params: Key-Value-Array aus dem per GET übergebenen Parametern
+   * 	@return int
+   * 	Response-Code, 0 means everything is fine
    *
    */
 
-  function validate_transaction($mbe4_params, $mbe4_password) {
+  public function validate_transaction($mbe4_params, $mbe4_password) {
     // check hash Signierung
     $hashbase =
         $mbe4_password .
@@ -104,14 +110,14 @@ class Mbe4 {
     return $mbe4_params["responsecode"]; // Transaktionscode zurückgeben
   }
 
-  function is_valid_responsecode($responsecode) {
+  public function is_valid_responsecode($responsecode) {
     if ($responsecode == 0)
       return TRUE;
     else
       return FALSE;
   }
 
-  function get_responsemsg_by_responsecode($responsecode) {
+  public function get_responsemsg_by_responsecode($responsecode) {
     switch ($responsecode) {
       case 0: return('OK');
       case 1: return('NOT FINAL – request was processed successfully but the answer is not final. (e.g. a TAN was sent to the subscriber and tan received must be called)');
