@@ -1,4 +1,12 @@
 <?php 
+
+/**
+ * @file
+ * Installfile for uc_mbe4.
+ *
+ * Development sponsored by just make IT! GbR - http://www.justmakeit.de/
+ */
+
 /**
  * hook_uninstall
  */
