@@ -26,15 +26,13 @@ class Mbe4 {
    *  Send transaction to mbe4.
    *
    *  @param float $amount
-   *      The amount to pay
-   *
+   *        The amount to pay
    *  @param int $contentclass
-   *      The mbe4-contentclass, look at readme.txt for more informations.
-   *
+   *        The mbe4-contentclass, look at readme.txt for more informations.
    *  @param string $returnurl
-   *      The mbe4-return-url. After redirect to mbe4.
+   *        The mbe4-return-url. After redirect to mbe4.
    *  @param bool $urlencode
-   *      Should the GET-Url be encoded with urlencode()?
+   *        Should the GET-Url be encoded with urlencode()?
    *
    *  @return: key/value-Array
    */
