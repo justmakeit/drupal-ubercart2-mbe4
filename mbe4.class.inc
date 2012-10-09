@@ -85,7 +85,7 @@ class Mbe4 {
    * String erstellt.
    *
    *  @param array $mbe4_params
-   *      $mbe4_params: Key-Value-Array aus dem per GET übergebenen Parametern
+   *        $mbe4_params: Key-Value-Array aus dem per GET übergebenen Parametern
    *
    * 	@return int
    * 	    Response-Code, 0 means everything is fine
