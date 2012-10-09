@@ -143,9 +143,9 @@ function uc_mbe4_complete($cart_id = 0) {
   // Erstellung mbe4-Objekt.
   $mbe4obj = new Mbe4(variable_get('uc_mbe4_username', ''), variable_get('uc_mbe4_password', ''), variable_get('uc_mbe4_clientid', ''), variable_get('uc_mbe4_serviceid', ''), variable_get('uc_mbe4_url', ''));
   // Validierung der Parameter.
-  $result = $mbe4obj->validate_transaction($_GET, variable_get('uc_mbe4_password', ''));
+  $result = $mbe4obj->validateTransaction($_GET, variable_get('uc_mbe4_password', ''));
   // Ist die Transaktion gültig?.
-  if ($mbe4obj->is_valid_responsecode($result)) {
+  if ($mbe4obj->isValidResponsecode($result)) {
     $comment = t('Paid by !type, mbe4 order #!order.');
     uc_payment_enter($order->order_id, 'mbe4', $order->order_total, 0, NULL, $comment);
     // Empty that cart.
@@ -160,7 +160,7 @@ function uc_mbe4_complete($cart_id = 0) {
     }
   }
   else {
-    watchdog('uc_mbe4_transaction', "mbe4 transaction failed: " . $mbe4obj->get_responsemsg_by_responsecode($result));
+    watchdog('uc_mbe4_transaction', "mbe4 transaction failed: " . $mbe4obj->getResponsemsgByResponsecode($result));
     drupal_set_message('mbe4 transaction failed!', 'error');
     drupal_goto('cart/checkout/review');
     return $output;
