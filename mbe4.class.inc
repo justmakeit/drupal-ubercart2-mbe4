@@ -26,15 +26,15 @@ class Mbe4 {
    *  Send transaction to mbe4.
    *
    *  @param float $amount
-   *  The amount to pay
+   *    The amount to pay
    *
    *  @param int $contentclass
-   *  The mbe4-contentclass, look at readme.txt for more informations.
-   * 
+   *    The mbe4-contentclass, look at readme.txt for more informations.
+   *
    *  @param string $returnurl
-   *  The mbe4-return-url. After redirect to mbe4.
+   *    The mbe4-return-url. After redirect to mbe4.
    *  @param bool $urlencode
-   *  Should the GET-Url be encoded with urlencode()?
+   *    Should the GET-Url be encoded with urlencode()?
    *
    *  @return: key/value-Array
    */
@@ -42,8 +42,7 @@ class Mbe4 {
     // Generate Timestamp.
     $timestamp = date("Y-m-d") . "T" . date("H:i:s.000") . "Z";
     // Generate Hashbase.
-    $hashbase 
-        =
+    $hashbase =
         $this->password .
         $this->username .
         $this->clientid .
@@ -65,7 +64,8 @@ class Mbe4 {
       'contentclass' => $contentclass,
       'description' => $description,
       'clienttransactionid' => $id,
-      'amount' => $amount, // mbe4 wants ct, no eur.
+      // Mbe4 wants ct, no eur.
+      'amount' => $amount,
       'callbackurl' => $returnurl,
       'timestamp' => $timestamp,
       'hash' => $hashparam,
@@ -81,15 +81,16 @@ class Mbe4 {
 
   /** 	
    * Function validate_transaction($mbe4_params).
-   * 
-   * Validierung der Zahlung. Dafür werden die von mbe4 übergebenen Parameter 
-   * plus das mbe4-Password hintereinander gehängt und eine MD5-Summe aus dem 
+   *
+   * Validierung der Zahlung. Dafür werden die von mbe4 übergebenen Parameter
+   * plus das mbe4-Password hintereinander gehängt und eine MD5-Summe aus dem
    * String erstellt.
    *
    *  @param array $mbe4_params
-   *  $mbe4_params: Key-Value-Array aus dem per GET übergebenen Parametern
+   *    $mbe4_params: Key-Value-Array aus dem per GET übergebenen Parametern
+   * 
    * 	@return int
-   * 	Response-Code, 0 means everything is fine
+   * 	  Response-Code, 0 means everything is fine
    *
    */
 
@@ -105,9 +106,11 @@ class Mbe4 {
         $mbe4_params["operatorid"] .
         $mbe4_params["timestamp"];
     if (md5($hashbase) != $mbe4_params["hash"]) {
-      return 999; // Parameter nicht korrekt oder manipuliert!
+      // Parameter nicht korrekt oder manipuliert.
+      return 999; 
     }
-    return $mbe4_params["responsecode"]; // Transaktionscode zurückgeben
+    // Transaktionscode zurückgeben.
+    return $mbe4_params["responsecode"]; 
   }
 
   public function is_valid_responsecode($responsecode) {
@@ -145,7 +148,4 @@ class Mbe4 {
       default: return(900);
     }
   }
-
 }
-
-?>
